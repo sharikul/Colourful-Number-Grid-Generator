@@ -1,12 +1,13 @@
 import xlsxwriter
 from pathlib import Path
 import json
+import tkinter as tk
+griddy = json.load(Path("griddy.json").open("r", encoding="UTF-8")) if Path("griddy.json").exists() == True else {}
 def cngg(inp:int = 100, ind:bool = False):
     inp = int(inp)
     numList = list(range(1,inp + 1))
     squares = {} # this dictionary stores the result of squaring numbers up to the value of `inp` in the key, whose value is the number squared, which is then searched to identify a squared number closer to `inp`, whose value is then set as the total columns and rows to have in the grid, to ensure griddiness as much as possible.
     squaresInGrid = {} # this stores the row and column information for square numbers in the grid which then populates a reference table below the grid
-    griddy = json.load(Path("griddy.json").open("r", encoding="UTF-8")) if Path("griddy.json").exists() == True else {}
     sq = 1
     while sq <= inp:
         squares[sq * sq] = sq
@@ -17,7 +18,7 @@ def cngg(inp:int = 100, ind:bool = False):
             sq += 1
 
     with xlsxwriter.Workbook(f"{"CNGG" if ind == False else "CNGG (" + str(inp) + ")"}.xlsx") as xl:
-        ws = xl.add_worksheet()
+        ws = xl.add_worksheet("Grid")
         row = 0
         col = 0
         for eachNumPos, eachNum in enumerate(numList):
@@ -61,6 +62,7 @@ def cngg(inp:int = 100, ind:bool = False):
             col += 1
         ws.freeze_panes(1,1)
         ws.hide_gridlines(2)
+
         ws.write(row + 2,1, f"Numbers between 1 and {inp}, with square numbers ({len(squaresInGrid)} in grid) coloured in red, cross-grid numbers coloured in orange, and middle column and middle row numbers coloured in green, unless they are square numbers.")
         if griddy.get(str(inp)) != None:
             ws.write_row(0,0,["GRIDDY"], xl.add_format({"bold": True, "font_name": "Cascadia Code", "font_color": "red", "align": "center"}))
@@ -69,7 +71,7 @@ def cngg(inp:int = 100, ind:bool = False):
         for squ in squaresInGrid:
             ws.write_row(row + i, 1, [int(squ), squaresInGrid[squ][0], squaresInGrid[squ][1]], xl.add_format({"font_name": "Cascadia Code", "align": "center"}))
             i += 1
-        ws.add_table(row + 5, 1, row + i - 1, 3, {"columns": [{"header": col} for col in ["#", "Row", "Col"]], "style": "Table Style Light 8"})
+        ws.add_table(row + 5, 1, row + i, 3, {"total_row": True, "columns": [{"header": col, "total_function": "count"} if col == "#" else {"header": col} for col in ["#", "Row", "Col"]], "style": "Table Style Light 8"})
         ws.set_row(row + 5,cell_format=xl.add_format({"align": "center"}))
         
     if len(griddy) > 0:
@@ -77,3 +79,43 @@ def cngg(inp:int = 100, ind:bool = False):
             gridJSON.write(json.dumps(griddy, indent=2, ensure_ascii=False))
 
     return [numList, squares, griddy, rowsCol]
+
+def gui():
+    cnggInterface = tk.Tk()
+    cnggInterface.title("Colourful Number Grid Generator")
+    inputFieldNum = tk.StringVar(value="100")
+    cnggInpLabel = tk.Label(cnggInterface, text = "Input number")
+    cnggInp = tk.Entry(cnggInterface, textvariable=inputFieldNum)
+    saveAsIndFiles = tk.BooleanVar(value = False)
+    saveAsCheckbox = tk.Checkbutton(cnggInterface, variable = saveAsIndFiles, text = "Export to separate Excel")
+
+    def interfaceSubmit():
+        cngg(cnggInp.get(), saveAsIndFiles.get())
+
+    submit = tk.Button(cnggInterface, text = 'Run CNGG', command = interfaceSubmit)
+    cnggInpLabel.grid(row = 1, column = 0)
+    cnggInp.grid(row = 1, column = 1)
+    saveAsCheckbox.grid(row = 1, column = 2)
+    submit.grid(row = 1, column = 3)
+
+    def showGriddyNumbers():
+        def selectGriddy(event):
+            inputFieldNum.set(list(griddy.keys())[reses.curselection()[0] - 1])
+        griddyWindow = tk.Tk()
+        griddyWindow.title("List of griddy inputs")
+        scrl = tk.Scrollbar(griddyWindow)
+        scrl.pack(side='right', fill='y')
+        reses = tk.Listbox(griddyWindow,yscrollcommand=scrl.set)
+        reses.bind("<Double-1>", selectGriddy)
+        reses.insert(0, "Numbers")
+        griddyWindow.minsize(200,100)
+        colNum = 0
+        for x in list(griddy.keys()):
+            reses.insert(colNum+1, f"{colNum}. {x}")
+            colNum += 1
+        reses.pack(side="left", fill = "both")
+        scrl.config(command = reses.yview)
+        
+    seeGriddy = tk.Button(cnggInterface, text = 'See griddy numbers', command = showGriddyNumbers)
+    seeGriddy.grid(row = 2, column = 0)
+    cnggInterface.mainloop()

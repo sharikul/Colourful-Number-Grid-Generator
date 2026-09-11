@@ -3,12 +3,14 @@ Original project name: Colourful Number Grid Generator
 Current project name: Colourful Number Grid Generator
 Start date: 2026-09-05
 Current status: Complete
-Initial completion date: 2026-09-10
+Initial completion date: 2026-09-09
+Last updated: 2026-09-10
 Language: Python
 ---
 # Colourful Number Grid Generator
 * **Project started**: Saturday, 05 September 2026
-* **Project completed**: Thursday, 10 September 2026
+* **Project completed**: Wednesday, 09 September 2026
+* **Project last updated**: Thursday, 10 September 2026
 
 ## Background
 A playful script to generate a grid of numbers starting from 1 to the number supplied as the argument (default is 100), which is exported to Excel. Square numbers are highlighted in red, and numbers that cross the grid are coloured in orange, to produce a colourful grid that when zoomed out looks similar to the Union Jack flag.

@@ -3,7 +3,15 @@ from pathlib import Path
 import json
 import tkinter as tk
 griddy = json.load(Path("griddy.json").open("r", encoding="UTF-8")) if Path("griddy.json").exists() == True else {}
-def cngg(inp:int = 100, ind:bool = False):
+def cngg(inp:int = 100, ind:bool = False) -> list:
+    """
+    Args:
+        inp (int, optional): Sets the maximum number for the grid. Defaults to 100.
+        ind (bool, optional): If True, a grid will be exported to a separate Excel file, with the . Defaults to False.
+
+    Returns:
+        list: Returns a list containing the numbers in the grid from 1 to the number specified in `inp`, dictionary of square numbers with the squared number as the key, and the number squared as their value, dictionary of griddy numbers (numbers which produce a clean grid allowing for a clean cross grid with no additional rows), and the number used to set the total number of rows and columns
+    """
     inp = int(inp)
     numList = list(range(1,inp + 1))
     squares = {} # this dictionary stores the result of squaring numbers up to the value of `inp` in the key, whose value is the number squared, which is then searched to identify a squared number closer to `inp`, whose value is then set as the total columns and rows to have in the grid, to ensure griddiness as much as possible.

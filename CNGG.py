@@ -132,7 +132,7 @@ def cngg(inp:int = 100, ind:bool = False) -> list:
 
 def gui():
     cnggInterface = tk.Tk()
-    cnggInterface.resizable(0,0)
+    cnggInterface.resizable(0,0) # this prevents the user interface window from being resizable to force it to look neat
     ttkStyle = ttk.Style()
     allThemes = ttkStyle.theme_names()
     currentTheme = tk.StringVar(value = "default")
@@ -178,7 +178,5 @@ def gui():
         griddyDropdown = ttk.OptionMenu(cnggInterface, griddyNumber, *griddy, command=selectGriddy)
         griddyDropdownLabel.grid(row = 2, column = 0)
         griddyDropdown.grid(row = 2, column = 1)
-
-
 
     cnggInterface.mainloop()
